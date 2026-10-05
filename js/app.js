@@ -1,0 +1,11 @@
+const state={segments:12,events:[
+ {level:'warn',title:'Anchor-drag signature',meta:'Segment 07 • synthetic • confidence 81%'},
+ {level:'crit',title:'High-energy vibration cluster',meta:'Segment 03 • synthetic • confidence 94%'},
+ {level:'ok',title:'Landing-station heartbeat',meta:'Segment 12 • normal • 8 s ago'},
+ {level:'ok',title:'Edge classifier health check',meta:'Pipeline • normal • 19 s ago'}]};
+const cableColors=['#43d69b','#43d69b','#ff647c','#43d69b','#43d69b','#43d69b','#f2c14e','#43d69b','#43d69b','#43d69b','#43d69b','#43d69b'];
+function draw(){const c=document.querySelector('#cables'),n=document.querySelector('#nodes');c.innerHTML='';n.innerHTML='';for(let i=0;i<12;i++){let y=75+i*31,x1=80+(i%3)*35,x2=820-(i%4)*20;let p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',`M ${x1} ${y} C ${280+i*5} ${y-60+(i%2)*70}, ${590-i*6} ${y+45-(i%3)*30}, ${x2} ${y+10}`);p.setAttribute('class','cable');p.setAttribute('stroke',cableColors[i]);c.appendChild(p);[ [x1,y],[x2,y+10] ].forEach(([x,yy])=>{let q=document.createElementNS('http://www.w3.org/2000/svg','circle');q.setAttribute('cx',x);q.setAttribute('cy',yy);q.setAttribute('r',6);q.setAttribute('class','node');n.appendChild(q)});}}
+function renderEvents(){document.querySelector('#events').innerHTML=state.events.map(e=>`<div class="event ${e.level}"><b>${e.title}</b><span>${e.meta}</span></div>`).join('');document.querySelector('#alertsCount').textContent=state.events.filter(e=>e.level!=='ok').length;}
+function tick(){document.querySelector('#lastUpdate').textContent=new Date().toLocaleTimeString();document.querySelector('#confidence').textContent=(92+Math.floor(Math.random()*5))+'%';}
+document.querySelector('#injectBtn').onclick=()=>{state.events.unshift({level:'warn',title:'Transient strain anomaly',meta:'Segment '+String(1+Math.floor(Math.random()*12)).padStart(2,'0')+' • synthetic • confidence 78%'});state.events=state.events.slice(0,6);renderEvents();};
+document.querySelector('#year').textContent=new Date().getFullYear();draw();renderEvents();tick();setInterval(tick,1000);
