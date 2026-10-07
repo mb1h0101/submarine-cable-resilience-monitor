@@ -1,4 +1,4 @@
-# Submarine Cable Resilience Monitor
+# Ocean Pulse — Taiwan Submarine Cable & Network Resilience Monitor
 
 An **independent, software-only reimplementation** for visualizing submarine-cable monitoring concepts, network resilience, synthetic risk events, and public-tech communication.
 
