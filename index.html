@@ -2,56 +2,110 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Submarine Cable Resilience Monitor</title>
-<meta name="description" content="Open-source software-only prototype for submarine cable monitoring, network resilience visualization, and public-tech communication.">
+<title>Ocean Pulse — Taiwan Network Resilience Monitor</title>
+<meta name="description" content="Public-tech dashboard combining open submarine-cable topology with live Internet reachability signals for Taiwan and the Asia-Pacific.">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header class="topbar">
-  <div><div class="eyebrow">PUBLIC-TECH / NETWORK RESILIENCE</div><h1>Submarine Cable Resilience Monitor</h1></div>
-  <div class="status"><span id="statusDot"></span><strong id="systemStatus">SIMULATION ONLINE</strong></div>
-</header>
-<main>
-<section class="hero grid2">
   <div>
-    <h2>Software-only resilience dashboard</h2>
-    <p>This independent reimplementation visualizes hypothetical submarine-cable risk events, monitoring zones, alert severity, and response context. It does <strong>not</strong> connect to a live DAS interrogator or telecom operator network.</p>
-    <div class="tags"><span>Open Source</span><span>Network Resilience</span><span>DAS Concept</span><span>Public Tech</span></div>
+    <div class="eyebrow">OCEAN PULSE / PUBLIC INFRASTRUCTURE INTELLIGENCE</div>
+    <h1>Taiwan Submarine Cable & Network Resilience Monitor</h1>
+    <p class="sub">Open cable topology + live public Internet observability + scenario analysis</p>
   </div>
-  <div class="metrics">
-    <article><small>Monitored segments</small><b id="segmentsCount">12</b></article>
-    <article><small>Active alerts</small><b id="alertsCount">2</b></article>
-    <article><small>System confidence</small><b id="confidence">94%</b></article>
-    <article><small>Last update</small><b id="lastUpdate">--:--:--</b></article>
+  <div class="live"><span></span><div><small>PUBLIC DATA MODE</small><b id="syncState">SYNCING…</b></div></div>
+</header>
+
+<nav class="tabs">
+  <button class="active" data-tab="overview">Overview</button>
+  <button data-tab="network">Live Network</button>
+  <button data-tab="sources">Data Sources</button>
+  <a href="https://github.com/mb1h0101/submarine-cable-resilience-monitor" target="_blank">GitHub ↗</a>
+</nav>
+
+<main>
+<section class="hero">
+  <div>
+    <div class="kicker">TAIWAN / ASIA-PACIFIC</div>
+    <h2>From cable geography to measurable network resilience.</h2>
+    <p>This dashboard combines public undersea-cable map data with live Internet measurement infrastructure. It is designed for civic-tech, research, policy discussion, and future authorized infrastructure integration.</p>
+  </div>
+  <div class="sourceChips"><span>OpenStreetMap / Overpass</span><span>RIPE Atlas Live API</span><span>RouteViews-ready</span><span>Scenario Lab</span></div>
+</section>
+
+<section id="overview" class="tabPage active">
+  <div class="metricRow">
+    <article><small>TW RIPE Atlas probes</small><b id="twCount">—</b><em id="twConnected">loading live data</em></article>
+    <article><small>Regional connected probes</small><b id="regionConnected">—</b><em>TW · JP · PH · ID · SG</em></article>
+    <article><small>Public cable objects</small><b id="cableCount">—</b><em id="cableSourceState">querying OpenStreetMap</em></article>
+    <article><small>Last public-data sync</small><b id="lastSync">—</b><em>browser-side fetch</em></article>
+  </div>
+
+  <div class="mainGrid">
+    <article class="panel mapPanel">
+      <div class="panelHead">
+        <div><small>PUBLIC CABLE TOPOLOGY</small><h3>Taiwan & Nearby Undersea Infrastructure</h3></div>
+        <div class="controls"><button id="reloadData">Refresh public data</button><button id="scenarioBtn" class="secondary">Run scenario</button></div>
+      </div>
+      <div class="mapWrap">
+        <svg id="map" viewBox="0 0 960 620" aria-label="Taiwan submarine cable topology map">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <linearGradient id="sea" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#06192b"/><stop offset="1" stop-color="#092f46"/></linearGradient>
+          </defs>
+          <rect width="960" height="620" rx="18" fill="url(#sea)"/>
+          <g class="gridlines"></g>
+          <g id="osmCables"></g>
+          <g id="fallbackCables"></g>
+          <path id="taiwan" d="M505 112 C530 142 548 180 543 222 C539 265 520 305 508 349 C497 392 478 440 448 474 C430 494 412 482 418 450 C424 417 442 387 449 348 C457 304 456 265 468 223 C479 184 482 141 505 112Z"/>
+          <circle class="landing" cx="463" cy="329" r="7"/><text x="474" y="333">Tainan / southwest corridor</text>
+          <circle class="landing" cx="526" cy="209" r="7"/><text x="538" y="213">North / northeast corridor</text>
+          <circle class="landing" cx="444" cy="420" r="7"/><text x="455" y="424">South corridor</text>
+          <g id="probeLayer"></g>
+        </svg>
+        <div class="legend"><span><i class="cable"></i>OSM/public cable topology</span><span><i class="probe"></i>RIPE Atlas probe</span><span><i class="scenario"></i>Scenario overlay</span></div>
+      </div>
+      <div id="mapNotice" class="notice">Loading open-data layers…</div>
+    </article>
+
+    <aside class="sideStack">
+      <article class="panel">
+        <small>LIVE INTERNET OBSERVABILITY</small><h3>Regional Measurement Footprint</h3>
+        <div id="countryBars" class="bars"></div>
+      </article>
+      <article class="panel">
+        <small>RESILIENCE WORKFLOW</small><h3>What the dashboard can actually measure</h3>
+        <div class="flow">
+          <span>Public cable topology</span><b>→</b><span>Internet probes / BGP</span><b>→</b><span>Reachability anomaly</span><b>→</b><span>Scenario & policy view</span>
+        </div>
+      </article>
+      <article class="panel scenarioPanel">
+        <small>SCENARIO LAB</small><h3 id="scenarioTitle">No scenario active</h3>
+        <p id="scenarioText">Use the scenario control to model a hypothetical international-link disruption and compare it with live public network measurements.</p>
+        <div class="score"><span>Resilience indicator</span><b id="resilienceScore">—</b></div>
+      </article>
+    </aside>
   </div>
 </section>
-<section class="grid2">
-  <article class="panel mapPanel">
-    <div class="panelHead"><div><small>MONITORING VIEW</small><h3>Submarine Cable Segments</h3></div><button id="injectBtn">Inject demo event</button></div>
-    <svg id="map" viewBox="0 0 900 520" role="img" aria-label="Synthetic submarine cable map">
-      <defs><filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <path class="coast" d="M30 70 C180 35,180 180,310 155 S460 65,560 120 S690 230,870 160 L870 20 L30 20Z"/>
-      <path class="coast" d="M40 430 C160 340,260 490,380 415 S610 365,870 450 L870 510 L30 510Z"/>
-      <g id="cables"></g>
-      <g id="nodes"></g>
-    </svg>
-    <div class="legend"><span><i class="ok"></i>Normal</span><span><i class="warn"></i>Watch</span><span><i class="crit"></i>Critical</span></div>
-  </article>
-  <article class="panel">
-    <small>EVENT STREAM</small><h3>Detected / Simulated Events</h3>
-    <div id="events" class="events"></div>
-  </article>
+
+<section id="network" class="tabPage">
+  <div class="twoCol">
+    <article class="panel"><small>RIPE ATLAS LIVE API</small><h3>Taiwan Probe Status</h3><div id="probeTable" class="table"></div></article>
+    <article class="panel"><small>ROUTING DATA</small><h3>BGP / Route Monitoring Layer</h3><p>RouteViews provides current and near-real-time global BGP routing data for network operators and researchers. The connector is separated from the browser UI so a later backend can add cached BGP anomaly indicators without exposing credentials or exceeding public rate limits.</p><a class="linkBtn" href="https://api.routeviews.org/docs/" target="_blank">Open RouteViews API documentation ↗</a></article>
+  </div>
 </section>
-<section class="grid3">
-  <article class="panel"><small>RISK INDEX</small><h3>Resilience Score</h3><div class="gauge"><div id="gaugeFill"></div><b id="score">82</b></div><p class="muted">Synthetic indicator combining alert state, segment availability, and event confidence.</p></article>
-  <article class="panel"><small>DATA PIPELINE</small><h3>Concept Architecture</h3><ol class="pipeline"><li>Fiber / DAS source</li><li>Edge preprocessing</li><li>Event classification</li><li>Risk aggregation</li><li>Dashboard + public alert context</li></ol></article>
-  <article class="panel"><small>BOUNDARIES</small><h3>Prototype Limitations</h3><ul><li>No live telecom network integration</li><li>No real DAS hardware feed</li><li>Demo data is synthetic</li><li>Not an emergency-warning system</li></ul></article>
-</section>
-<section class="panel about">
-  <small>PROJECT CONTEXT</small><h3>Why this exists</h3>
-  <p>This project is an independent software reimplementation intended to make submarine-cable resilience concepts easier to inspect, discuss, and extend in civic-tech, research, and public-policy settings. The codebase is designed as a software demonstrator that can later connect to validated public datasets or authorized sensor feeds.</p>
+
+<section id="sources" class="tabPage">
+  <div class="sourceGrid">
+    <article class="panel"><small>LIVE</small><h3>RIPE Atlas</h3><p>Anonymous public API is queried for probe counts and connection status in Taiwan and nearby countries. Public measurements can later be used for ping, traceroute and reachability baselines.</p><code>atlas.ripe.net/api/v2/probes/</code></article>
+    <article class="panel"><small>OPEN MAP</small><h3>OpenStreetMap / Overpass</h3><p>The map attempts to load underwater telecommunications line objects around Taiwan from OpenStreetMap. Coverage depends on what has been openly mapped.</p><code>communication=line + location=underwater</code></article>
+    <article class="panel"><small>ROUTING</small><h3>RouteViews</h3><p>Current routing-system observations can be added through the RouteViews API. This gives network-level evidence around reachability and route changes rather than pretending to expose operator cable telemetry.</p></article>
+    <article class="panel"><small>FUTURE AUTHORIZED INPUT</small><h3>DAS / operator / public-sector feeds</h3><p>The software architecture keeps a separate adapter layer for future field telemetry, incident feeds, or restricted datasets supplied under an authorized partnership.</p></article>
+  </div>
 </section>
 </main>
-<footer>Independent reimplementation • Software prototype • <span id="year"></span></footer>
+
+<footer><b>Ocean Pulse</b> · Independent public-tech implementation · Public-data connectors + scenario analysis · 2026</footer>
 <script src="js/app.js"></script>
-</body></html>
+</body>
+</html>
