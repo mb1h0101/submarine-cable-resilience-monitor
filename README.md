@@ -45,12 +45,13 @@ Then open `http://localhost:8000`.
 
 `data/demo-events.json` contains synthetic demonstration records only. Do not interpret them as real cable events.
 
-## Scope and limitations
+## Public release scope
 
-- No physical DAS hardware or ESP32 firmware is included.
-- No live carrier / landing-station integration is claimed.
-- No emergency-warning or life-safety use is intended.
-- All demo event records are synthetic unless a future source is explicitly documented.
+This repository publishes the monitoring software, visualization workflow, simulation layer, and integration architecture. The public release is designed so validated public datasets or authorized field telemetry can be connected later without redesigning the dashboard.
+
+- Current demo events are synthetic unless a source is explicitly documented.
+- Hardware-side acquisition and operator-side infrastructure are outside this public software repository.
+- The project is intended for research, civic-tech discussion, prototyping, and technical communication rather than emergency-warning operations.
 
 ## Project context
 
